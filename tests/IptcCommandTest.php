@@ -1,20 +1,21 @@
 <?php
 
 use Intervention\Image\Commands\IptcCommand;
+use PHPUnit\Framework\TestCase;
 
-class IptcCommandTest extends PHPUnit_Framework_TestCase
+class IptcCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testFetchAll()
     {
         $image = Mockery::mock('Intervention\Image\Image');
         $image->dirname = __DIR__.'/images';
         $image->basename = 'iptc.jpg';
-        $command = new IptcCommand(array());
+        $command = new IptcCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertTrue($command->hasOutput());
@@ -26,7 +27,7 @@ class IptcCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('Intervention\Image\Image');
         $image->dirname = __DIR__.'/images';
         $image->basename = 'exif.jpg';
-        $command = new IptcCommand(array('AuthorByline'));
+        $command = new IptcCommand(['AuthorByline']);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertTrue($command->hasOutput());
@@ -39,7 +40,7 @@ class IptcCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('Intervention\Image\Image');
         $image->dirname = __DIR__.'/images';
         $image->basename = 'exif.jpg';
-        $command = new IptcCommand(array('xxx'));
+        $command = new IptcCommand(['xxx']);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertTrue($command->hasOutput());
@@ -52,7 +53,7 @@ class IptcCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('Intervention\Image\Image');
         $image->dirname = __DIR__.'/images';
         $image->basename = 'star.png';
-        $command = new IptcCommand(array('Orientation'));
+        $command = new IptcCommand(['Orientation']);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertTrue($command->hasOutput());
@@ -62,7 +63,7 @@ class IptcCommandTest extends PHPUnit_Framework_TestCase
     public function testReturnNullOnIptcReadFail()
     {
         $image = Mockery::mock('Intervention\Image\Image');
-        $command = new IptcCommand(array('Orientation'));
+        $command = new IptcCommand(['Orientation']);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertTrue($command->hasOutput());

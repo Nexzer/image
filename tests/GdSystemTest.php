@@ -1,6 +1,8 @@
 <?php
 
-class GdSystemTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class GdSystemTest extends TestCase
 {
     public function testMakeFromPath()
     {
@@ -23,9 +25,17 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException \Intervention\Image\Exception\NotReadableException
      */
-    public function testMakeFromPathBroken()
+   public function testMakeFromPathBroken()
+   {
+       $this->manager()->make('tests/images/broken.png');
+   }
+
+    /**
+     * @expectedException \Intervention\Image\Exception\NotReadableException
+     */
+    public function testMakeFromNotExisting()
     {
-        $this->manager()->make('tests/images/broken.png');
+        $this->manager()->make('tests/images/not_existing.png');
     }
 
     public function testMakeFromString()
@@ -73,6 +83,38 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertInternalType('int', $img->getHeight());
         $this->assertEquals(10, $img->getWidth());
         $this->assertEquals(10, $img->getHeight());
+    }
+
+    public function testMakeFromBase64WithNewlines()
+    {
+        $data = 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+' . "\n" .
+                '9AAAAGElEQVQYlWM8c+bMfwYiABMxikYVUk8hAHWzA3' . "\n" .
+                'cRvs4UAAAAAElFTkSuQmCC';
+
+        $img = $this->manager()->make($data);
+
+        $this->assertInstanceOf('Intervention\Image\Image', $img);
+        $this->assertInternalType('resource', $img->getCore());
+        $this->assertInternalType('int', $img->getWidth());
+        $this->assertInternalType('int', $img->getHeight());
+        $this->assertEquals(10, $img->getWidth());
+        $this->assertEquals(10, $img->getHeight());
+    }
+
+    public function testMakeFromWebp()
+    {
+        if (function_exists('imagecreatefromwebp')) {
+            $img = $this->manager()->make('tests/images/test.webp');
+            $this->assertInstanceOf('Intervention\Image\Image', $img);
+            $this->assertInternalType('resource', $img->getCore());
+            $this->assertEquals(16, $img->getWidth());
+            $this->assertEquals(16, $img->getHeight());
+            $this->assertEquals('image/webp', $img->mime);
+            $this->assertEquals('tests/images', $img->dirname);
+            $this->assertEquals('test.webp', $img->basename);
+            $this->assertEquals('webp', $img->extension);
+            $this->assertEquals('test', $img->filename);
+        }
     }
 
     public function testCanvas()
@@ -1020,9 +1062,9 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     public function testPixelImage()
     {
         $img = $this->manager()->make('tests/images/tile.png');
-        $coords = array(array(5, 5), array(12, 12));
+        $coords = [[5, 5], [12, 12]];
         $img = $img->pixel('fdf5e4', $coords[0][0], $coords[0][1]);
-        $img = $img->pixel(array(255, 255, 255), $coords[1][0], $coords[1][1]);
+        $img = $img->pixel([255, 255, 255], $coords[1][0], $coords[1][1]);
         $this->assertEquals('#fdf5e4', $img->pickColor($coords[0][0], $coords[0][1], 'hex'));
         $this->assertEquals('#ffffff', $img->pickColor($coords[1][0], $coords[1][1], 'hex'));
     }
@@ -1034,7 +1076,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Intervention\Image\Image', $img);
         $this->assertEquals('a9e2b15452b2a4637b65625188d206f6', $img->checksum());
 
-        
+
         $img = $this->manager()->canvas(16, 16, 'ffffff');
         $img = $img->text('0', 8, 2, function($font) {
             $font->align('center');
@@ -1043,7 +1085,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         });
         $this->assertInstanceOf('Intervention\Image\Image', $img);
         $this->assertEquals('649f3f529d3931c56601155fd2680959', $img->checksum());
-        
+
         $img = $this->manager()->canvas(16, 16, 'ffffff');
         $img = $img->text('0', 8, 8, function($font) {
             $font->align('right');
@@ -1086,7 +1128,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     public function testPolygonImage()
     {
         $img = $this->manager()->canvas(16, 16, 'ffffff');
-        $points = array(3, 3, 11, 11, 7, 13);
+        $points = [3, 3, 11, 11, 7, 13];
         $img->polygon($points, function ($draw) { $draw->background('#ff0000'); $draw->border(1, '#0000ff'); });
         $this->assertEquals('e534ff90c8026f9317b99071fda01ed4', $img->checksum());
     }
@@ -1164,7 +1206,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertColorAtPosition('#0c02b4', $img, 6, 12);
         $this->assertColorAtPosition('#fcbe04', $img, 22, 24);
     }
-    
+
     public function testLimitColorsKeepTransparencyWithMatte()
     {
         $img = $this->manager()->make('tests/images/star.png');
@@ -1172,7 +1214,6 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertLessThanOrEqual(65, imagecolorstotal($img->getCore()));
         $this->assertTransparentPosition($img, 0, 0);
         $this->assertColorAtPosition('#04f204', $img, 12, 10);
-        $this->assertColorAtPosition('#06fe04', $img, 22, 17);
         $this->assertColorAtPosition('#e40214', $img, 16, 21);
     }
 
@@ -1234,7 +1275,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     {
         $img = $this->manager()->make('tests/images/tile.png');
         $img->limitColors(200);
-        
+
         $c = $img->pickColor(0, 0);
         $this->assertEquals(180, $c[0]);
         $this->assertEquals(226, $c[1]);
@@ -1296,7 +1337,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $this->assertColorAtPosition('#66ee70', $img, 0, 0);
         $this->assertColorAtPosition('#ffe600', $img, 24, 24);
     }
-    
+
     public function testTrimGradient()
     {
         $canvas = $this->manager()->make('tests/images/gradient.png');
@@ -1355,7 +1396,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     public function testTrimOnlyLeftAndRight()
     {
         $img = $this->manager()->make('tests/images/gradient.png');
-        $img->trim(null, array('left', 'right'), 60);
+        $img->trim(null, ['left', 'right'], 60);
         $this->assertEquals($img->getWidth(), 20);
         $this->assertEquals($img->getHeight(), 50);
     }
@@ -1363,7 +1404,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     public function testTrimOnlyTopAndBottom()
     {
         $img = $this->manager()->make('tests/images/gradient.png');
-        $img->trim(null, array('top', 'bottom'), 60);
+        $img->trim(null, ['top', 'bottom'], 60);
         $this->assertEquals($img->getWidth(), 50);
         $this->assertEquals($img->getHeight(), 20);
     }
@@ -1387,7 +1428,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
     public function testTrimWithFeather()
     {
         $canvas = $this->manager()->make('tests/images/trim.png');
-        
+
         $img = clone $canvas;
         $feather = 5;
         $img->trim(null, null, null, $feather);
@@ -1421,14 +1462,14 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         // trim only left and right with feather
         $img = clone $canvas;
         $feather = 10;
-        $img->trim(null, array('left', 'right'), null, $feather);
+        $img->trim(null, ['left', 'right'], null, $feather);
         $this->assertEquals($img->getWidth(), 28 + $feather * 2);
         $this->assertEquals($img->getHeight(), 50);
 
         // trim only top and bottom with feather
         $img = clone $canvas;
         $feather = 10;
-        $img->trim(null, array('top', 'bottom'), null, $feather);
+        $img->trim(null, ['top', 'bottom'], null, $feather);
         $this->assertEquals($img->getWidth(), 50);
         $this->assertEquals($img->getHeight(), 28 + $feather * 2);
 
@@ -1473,6 +1514,15 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $img = $this->manager()->make('tests/images/trim.png');
         $img->encode('gif');
         $this->assertInternalType('resource', imagecreatefromstring($img->encoded));
+    }
+
+    public function testEncodeWebp()
+    {
+        if (function_exists('imagewebp')) {
+            $img = $this->manager()->make('tests/images/trim.png');
+            $data = (string) $img->encode('webp');
+            $this->assertEquals('image/webp; charset=binary', $this->getMime($data));
+        }
     }
 
     public function testEncodeDataUrl()
@@ -1549,7 +1599,7 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
         $img = $this->manager()->canvas(16, 16, '#ff0000');
         $img->save($path);
         $img->destroy();
-        
+
         // open test image again
         $img = $this->manager()->make($path);
         $this->assertColorAtPosition('#ff0000', $img, 0, 0);
@@ -1640,8 +1690,14 @@ class GdSystemTest extends PHPUnit_Framework_TestCase
 
     private function manager()
     {
-        return new \Intervention\Image\ImageManager(array(
+        return new \Intervention\Image\ImageManager([
             'driver' => 'gd'
-        ));
+        ]);
+    }
+
+    private function getMime($data)
+    {
+        $finfo = new finfo(FILEINFO_MIME);
+        return $finfo->buffer($data);
     }
 }

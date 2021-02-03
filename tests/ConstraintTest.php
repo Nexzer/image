@@ -1,8 +1,9 @@
 <?php
 
 use Intervention\Image\Constraint;
+use PHPUnit\Framework\TestCase;
 
-class ConstraintTest extends PHPUnit_Framework_TestCase
+class ConstraintTest extends TestCase
 {
     public function tearDown()
     {
@@ -48,7 +49,7 @@ class ConstraintTest extends PHPUnit_Framework_TestCase
 
     private function getMockedSize($width, $height)
     {
-        $size = Mockery::mock('\Intervention\Image\Size', array($width, $height));
+        $size = Mockery::mock('\Intervention\Image\Size', [$width, $height]);
         $size->shouldReceive('getWidth')->andReturn($width);
         $size->shouldReceive('getHeight')->andReturn($height);
         $size->shouldReceive('getRatio')->andReturn($width/$height);

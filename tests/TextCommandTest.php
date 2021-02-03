@@ -1,14 +1,15 @@
 <?php
 
 use Intervention\Image\Commands\TextCommand;
+use PHPUnit\Framework\TestCase;
 
-class TextCommandTest extends PHPUnit_Framework_TestCase
+class TextCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testGd()
     {
         $resource = imagecreatefromjpeg(__DIR__.'/images/test.jpg');
@@ -17,7 +18,7 @@ class TextCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('\Intervention\Image\Image');
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($resource);
-        $command = new TextCommand(array('test', 10, 20));
+        $command = new TextCommand(['test', 10, 20]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());

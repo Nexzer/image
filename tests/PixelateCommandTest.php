@@ -2,20 +2,21 @@
 
 use Intervention\Image\Gd\Commands\PixelateCommand as PixelateGd;
 use Intervention\Image\Imagick\Commands\PixelateCommand as PixelateImagick;
+use PHPUnit\Framework\TestCase;
 
-class PixelateCommandTest extends PHPUnit_Framework_TestCase
+class PixelateCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testGd()
     {
         $resource = imagecreatefromjpeg(__DIR__.'/images/test.jpg');
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('getCore')->once()->andReturn($resource);
-        $command = new PixelateGd(array(10));
+        $command = new PixelateGd([10]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -29,7 +30,7 @@ class PixelateCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('getCore')->times(2)->andReturn($imagick);
         $image->shouldReceive('getWidth')->once()->andReturn(800);
         $image->shouldReceive('getHeight')->once()->andReturn(600);
-        $command = new PixelateImagick(array(10));
+        $command = new PixelateImagick([10]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }

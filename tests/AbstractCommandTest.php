@@ -1,12 +1,14 @@
 <?php
 
-class AbstractCommandTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class AbstractCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testArgument()
     {
         $command = $this->getTestCommand();
@@ -38,8 +40,8 @@ class AbstractCommandTest extends PHPUnit_Framework_TestCase
 
     public function getTestCommand()
     {
-        $arguments = array('foo', 'bar');
-        $command = $this->getMockForAbstractClass('\Intervention\Image\Commands\AbstractCommand', array($arguments));
+        $arguments = ['foo', 'bar'];
+        $command = $this->getMockForAbstractClass('\Intervention\Image\Commands\AbstractCommand', [$arguments]);
 
         return $command;
     }

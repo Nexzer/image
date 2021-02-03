@@ -1,6 +1,8 @@
 <?php
 
-class ImagickSystemTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ImagickSystemTest extends TestCase
 {
     public function testMakeFromPath()
     {
@@ -70,6 +72,23 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(10, $img->getHeight());
         $this->assertEquals('image/png', $img->mime);
     }
+
+    public function testMakeFromBase64WithNewlines()
+    {
+        $data = 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+' . "\n" .
+                '9AAAAGElEQVQYlWM8c+bMfwYiABMxikYVUk8hAHWzA3' . "\n" .
+                'cRvs4UAAAAAElFTkSuQmCC';
+
+        $img = $this->manager()->make($data);
+        $this->assertInstanceOf('Intervention\Image\Image', $img);
+        $this->assertInstanceOf('Imagick', $img->getCore());
+        $this->assertInternalType('int', $img->getWidth());
+        $this->assertInternalType('int', $img->getHeight());
+        $this->assertEquals(10, $img->getWidth());
+        $this->assertEquals(10, $img->getHeight());
+        $this->assertEquals('image/png', $img->mime);
+    }
+
 
     public function testCanvas()
     {
@@ -1017,9 +1036,9 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
     public function testPixelImage()
     {
         $img = $this->manager()->make('tests/images/tile.png');
-        $coords = array(array(5, 5), array(12, 12));
+        $coords = [[5, 5], [12, 12]];
         $img = $img->pixel('fdf5e4', $coords[0][0], $coords[0][1]);
-        $img = $img->pixel(array(255, 255, 255), $coords[1][0], $coords[1][1]);
+        $img = $img->pixel([255, 255, 255], $coords[1][0], $coords[1][1]);
         $this->assertEquals('#fdf5e4', $img->pickColor($coords[0][0], $coords[0][1], 'hex'));
         $this->assertEquals('#ffffff', $img->pickColor($coords[1][0], $coords[1][1], 'hex'));
     }
@@ -1055,7 +1074,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
     public function testPolygonImage()
     {
         $img = $this->manager()->canvas(16, 16, 'ffffff');
-        $points = array(3, 3, 11, 11, 7, 13);
+        $points = [3, 3, 11, 11, 7, 13];
         $img->polygon($points, function ($draw) { $draw->background('#ff0000'); $draw->border(1, '#0000ff'); });
         $this->assertEquals('e301afe179da858d441ad8fc0eb5490a', $img->checksum());
     }
@@ -1133,7 +1152,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         $this->assertColorAtPosition('#680098', $img, 6, 12);
         $this->assertColorAtPosition('#c2596a', $img, 22, 24);
     }
-    
+
     public function testLimitColorsKeepTransparencyWithMatte()
     {
         $img = $this->manager()->make('tests/images/star.png');
@@ -1203,7 +1222,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
     {
         $img = $this->manager()->make('tests/images/tile.png');
         $img->getCore()->quantizeImage(200, \Imagick::COLORSPACE_RGB, 0, false, false);
-        
+
         $c = $img->pickColor(0, 0);
         $this->assertEquals(180, $c[0]);
         $this->assertEquals(224, $c[1]);
@@ -1265,7 +1284,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         $this->assertColorAtPosition('#00ece2', $img, 0, 0);
         $this->assertColorAtPosition('#ffea00', $img, 24, 24);
     }
-    
+
     public function testTrimGradient()
     {
         $canvas = $this->manager()->make('tests/images/gradient.png');
@@ -1324,7 +1343,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
     public function testTrimOnlyLeftAndRight()
     {
         $img = $this->manager()->make('tests/images/gradient.png');
-        $img->trim(null, array('left', 'right'), 60);
+        $img->trim(null, ['left', 'right'], 60);
         $this->assertEquals($img->getWidth(), 20);
         $this->assertEquals($img->getHeight(), 50);
     }
@@ -1332,7 +1351,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
     public function testTrimOnlyTopAndBottom()
     {
         $img = $this->manager()->make('tests/images/gradient.png');
-        $img->trim(null, array('top', 'bottom'), 60);
+        $img->trim(null, ['top', 'bottom'], 60);
         $this->assertEquals($img->getWidth(), 50);
         $this->assertEquals($img->getHeight(), 20);
     }
@@ -1393,7 +1412,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         // trim only left and right with feather
         $img = $this->manager()->make('tests/images/trim.png');
         $feather = 10;
-        $img->trim(null, array('left', 'right'), null, $feather);
+        $img->trim(null, ['left', 'right'], null, $feather);
         $this->assertEquals($img->getWidth(), 28 + $feather * 2);
         $this->assertEquals($img->getHeight(), 50);
         $img->destroy();
@@ -1401,7 +1420,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         // trim only top and bottom with feather
         $img = $this->manager()->make('tests/images/trim.png');
         $feather = 10;
-        $img->trim(null, array('top', 'bottom'), null, $feather);
+        $img->trim(null, ['top', 'bottom'], null, $feather);
         $this->assertEquals($img->getWidth(), 50);
         $this->assertEquals($img->getHeight(), 28 + $feather * 2);
         $img->destroy();
@@ -1465,7 +1484,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         $img = $this->manager()->make('tests/images/exif.jpg');
         $data = $img->exif();
         $this->assertInternalType('array', $data);
-        $this->assertEquals(19, count($data));
+        $this->assertGreaterThanOrEqual(13, count($data));
     }
 
     public function testExifReadKey()
@@ -1527,7 +1546,7 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
         $img = $this->manager()->canvas(16, 16, '#ff0000');
         $img->save($path);
         $img->destroy();
-        
+
         // open test image again
         $img = $this->manager()->make($path);
         $this->assertColorAtPosition('#ff0000', $img, 0, 0);
@@ -1624,8 +1643,8 @@ class ImagickSystemTest extends PHPUnit_Framework_TestCase
 
     private function manager()
     {
-        return new \Intervention\Image\ImageManager(array(
+        return new \Intervention\Image\ImageManager([
             'driver' => 'imagick'
-        ));
+        ]);
     }
 }

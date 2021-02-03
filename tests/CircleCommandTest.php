@@ -1,14 +1,15 @@
 <?php
 
 use Intervention\Image\Commands\CircleCommand;
+use PHPUnit\Framework\TestCase;
 
-class CircleCommandTest extends PHPUnit_Framework_TestCase
+class CircleCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testGd()
     {
         $resource = imagecreatefromjpeg(__DIR__.'/images/test.jpg');
@@ -17,7 +18,7 @@ class CircleCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('\Intervention\Image\Image');
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($resource);
-        $command = new CircleCommand(array(250, 10, 20));
+        $command = new CircleCommand([250, 10, 20]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());
@@ -33,7 +34,7 @@ class CircleCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($imagick);
 
-        $command = new CircleCommand(array(25, 10, 20));
+        $command = new CircleCommand([25, 10, 20]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());

@@ -1,14 +1,15 @@
 <?php
 
 use Intervention\Image\Commands\LineCommand;
+use PHPUnit\Framework\TestCase;
 
-class LineCommandTest extends PHPUnit_Framework_TestCase
+class LineCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testGd()
     {
         $resource = imagecreatefromjpeg(__DIR__.'/images/test.jpg');
@@ -17,7 +18,7 @@ class LineCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('\Intervention\Image\Image');
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($resource);
-        $command = new LineCommand(array(10, 15, 100, 150));
+        $command = new LineCommand([10, 15, 100, 150]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());
@@ -33,7 +34,7 @@ class LineCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($imagick);
 
-        $command = new LineCommand(array(10, 15, 100, 150));
+        $command = new LineCommand([10, 15, 100, 150]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());

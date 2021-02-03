@@ -1,14 +1,15 @@
 <?php
 
 use Intervention\Image\Commands\EllipseCommand;
+use PHPUnit\Framework\TestCase;
 
-class EllipseCommandTest extends PHPUnit_Framework_TestCase
+class EllipseCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testGd()
     {
         $resource = imagecreatefromjpeg(__DIR__.'/images/test.jpg');
@@ -17,7 +18,7 @@ class EllipseCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('\Intervention\Image\Image');
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($resource);
-        $command = new EllipseCommand(array(250, 150, 10, 20));
+        $command = new EllipseCommand([250, 150, 10, 20]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());
@@ -33,7 +34,7 @@ class EllipseCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($imagick);
 
-        $command = new EllipseCommand(array(250, 150, 10, 20));
+        $command = new EllipseCommand([250, 150, 10, 20]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());

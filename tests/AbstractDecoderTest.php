@@ -1,12 +1,14 @@
 <?php
 
-class AbstractDecoderTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class AbstractDecoderTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testIsImagick()
     {
         $source = $this->getTestDecoder(new \Imagick);
@@ -40,7 +42,7 @@ class AbstractDecoderTest extends PHPUnit_Framework_TestCase
         $source = $this->getTestDecoder(null);
         $this->assertFalse($source->isFilepath());
 
-        $source = $this->getTestDecoder(array());
+        $source = $this->getTestDecoder([]);
         $this->assertFalse($source->isFilepath());
 
         $source = $this->getTestDecoder(new stdClass);
@@ -61,6 +63,9 @@ class AbstractDecoderTest extends PHPUnit_Framework_TestCase
         $source = $this->getTestDecoder(fopen(__DIR__ . '/images/test.jpg', 'r'));
         $this->assertTrue($source->isStream());
 
+        $source = $this->getTestDecoder(new \GuzzleHttp\Psr7\Stream(fopen(__DIR__ . '/images/test.jpg', 'r')));
+        $this->assertTrue($source->isStream());
+
         $source = $this->getTestDecoder(null);
         $this->assertFalse($source->isStream());
     }
@@ -79,7 +84,7 @@ class AbstractDecoderTest extends PHPUnit_Framework_TestCase
         $source = $this->getTestDecoder(0);
         $this->assertFalse($source->isBinary());
 
-        $source = $this->getTestDecoder(array(1,2,3));
+        $source = $this->getTestDecoder([1,2,3]);
         $this->assertFalse($source->isBinary());
 
         $source = $this->getTestDecoder(new stdClass);
@@ -139,10 +144,17 @@ class AbstractDecoderTest extends PHPUnit_Framework_TestCase
         $base64 = "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAGElEQVQYlWM8c+bMfwYiABMxikYVUk8hAHWzA3cRvs4UAAAAAElFTkSuQmCC";
         $decoder = $this->getTestDecoder($base64);
         $this->assertTrue($decoder->isBase64());
+
+        $base64WithNewlines = 'iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+' . "\n" .
+                              '9AAAAGElEQVQYlWM8c+bMfwYiABMxikYVUk8hAHWzA3' . "\n" .
+                              'cRvs4UAAAAAElFTkSuQmCC';
+
+        $decoder = $this->getTestDecoder($base64WithNewlines);
+        $this->assertTrue($decoder->isBase64());
     }
 
     public function getTestDecoder($data)
     {
-        return $this->getMockForAbstractClass('\Intervention\Image\AbstractDecoder', array($data));
+        return $this->getMockForAbstractClass('\Intervention\Image\AbstractDecoder', [$data]);
     }
 }

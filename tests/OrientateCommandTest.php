@@ -1,20 +1,21 @@
 <?php
 
 use Intervention\Image\Commands\OrientateCommand;
+use PHPUnit\Framework\TestCase;
 
-class OrientateCommandTest extends PHPUnit_Framework_TestCase
+class OrientateCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testExecuteOrientationTwo()
     {
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(2);
         $image->shouldReceive('flip')->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -24,7 +25,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(3);
         $image->shouldReceive('rotate')->with(180)->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -35,7 +36,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(4);
         $image->shouldReceive('rotate')->with(180)->once()->andReturn($image);
         $image->shouldReceive('flip')->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -46,7 +47,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(5);
         $image->shouldReceive('rotate')->with(270)->once()->andReturn($image);
         $image->shouldReceive('flip')->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -56,7 +57,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(6);
         $image->shouldReceive('rotate')->with(270)->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -67,7 +68,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(7);
         $image->shouldReceive('rotate')->with(90)->once()->andReturn($image);
         $image->shouldReceive('flip')->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -77,7 +78,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(8);
         $image->shouldReceive('rotate')->with(90)->once();
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }
@@ -86,7 +87,7 @@ class OrientateCommandTest extends PHPUnit_Framework_TestCase
     {
         $image = Mockery::mock('Intervention\Image\Image');
         $image->shouldReceive('exif')->with('Orientation')->once()->andReturn(null);
-        $command = new OrientateCommand(array());
+        $command = new OrientateCommand([]);
         $result = $command->execute($image);
         $this->assertTrue($result);
     }

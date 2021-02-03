@@ -1,8 +1,10 @@
 <?php
 
 use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
+use PHPUnit\Framework\TestCase;
 
-class ImageTest extends PHPUnit_Framework_TestCase
+class ImageTest extends TestCase
 {
     public function tearDown()
     {
@@ -19,7 +21,7 @@ class ImageTest extends PHPUnit_Framework_TestCase
     {
         $image = $this->getTestImage();
         $result = $image->test(1, 2, 3);
-        $this->assertEquals('mock', $result);   
+        $this->assertEquals('mock', $result);
     }
 
     public function testEncode()
@@ -43,18 +45,37 @@ class ImageTest extends PHPUnit_Framework_TestCase
         @unlink($save_as);
     }
 
+    public function testFormatSave()
+    {
+        $save_as = __DIR__.'/tmp/test';
+
+        $config = ['driver' => new Intervention\Image\Imagick\Driver()];
+        $manager = new ImageManager($config);
+
+        $image = $manager->make('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+        $this->assertInstanceOf('Intervention\Image\Image', $image);
+        $this->assertInstanceOf('Imagick', $image->getCore());
+
+        $gifCore = $image->getCore();
+        $this->assertEquals($gifCore->getImageMimeType(), 'image/gif');
+        $image->save($save_as, null, 'jpg');
+
+        $this->assertEquals(\mime_content_type($save_as), 'image/jpeg');
+        @unlink($save_as);
+    }
+
     public function testIsEncoded()
     {
         $image = $this->getTestImage();
         $this->assertFalse($image->isEncoded());
-        
+
         $image->setEncoded('foo');
         $this->assertTrue($image->isEncoded());
     }
 
     public function testFilter()
     {
-        $demoFilter = Mockery::mock('\Intervention\Image\Filters\DemoFilter', array(15));
+        $demoFilter = Mockery::mock('\Intervention\Image\Filters\DemoFilter', [15]);
         $image = $this->getTestImage();
         $demoFilter->shouldReceive('applyFilter')->with($image)->once()->andReturn($image);
         $image->filter($demoFilter);
@@ -87,26 +108,26 @@ class ImageTest extends PHPUnit_Framework_TestCase
     {
         $image = $this->getTestImage();
         $backups = $image->getBackups();
-        $this->assertEquals(array(), $backups);
+        $this->assertEquals([], $backups);
 
         $image = $this->getTestImage();
         $image->setBackup('foo');
         $image->setBackup('bar');
         $image->setBackup('baz');
         $backups = $image->getBackups();
-        $this->assertEquals(array('default' => 'baz'), $backups);
+        $this->assertEquals(['default' => 'baz'], $backups);
 
         $image = $this->getTestImage();
         $image->setBackup('foo', 'a');
         $image->setBackup('bar', 'b');
         $image->setBackup('baz', 'c');
         $backups = $image->getBackups();
-        $this->assertEquals(array('a' => 'foo', 'b' => 'bar', 'c' => 'baz'), $backups);
+        $this->assertEquals(['a' => 'foo', 'b' => 'bar', 'c' => 'baz'], $backups);
     }
 
     private function getTestImage()
     {
-        $size = Mockery::mock('\Intervention\Image\Size', array(800, 600));
+        $size = Mockery::mock('\Intervention\Image\Size', [800, 600]);
         $driver = Mockery::mock('\Intervention\Image\AbstractDriver');
         $command = Mockery::mock('\Intervention\Image\Commands\AbstractCommand');
         $command->shouldReceive('hasOutput')->andReturn(true);

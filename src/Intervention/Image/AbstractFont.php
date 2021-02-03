@@ -14,7 +14,7 @@ abstract class AbstractFont
     /**
      * Text size in pixels
      *
-     * @var integer
+     * @var int
      */
     public $size = 12;
 
@@ -28,7 +28,7 @@ abstract class AbstractFont
     /**
      * Rotation angle of the text
      *
-     * @var integer
+     * @var int
      */
     public $angle = 0;
 
@@ -71,11 +71,18 @@ abstract class AbstractFont
      * Draws font to given image on given position
      *
      * @param  Image   $image
-     * @param  integer $posx
-     * @param  integer $posy
+     * @param  int     $posx
+     * @param  int     $posy
      * @return boolean
      */
     abstract public function applyToImage(Image $image, $posx = 0, $posy = 0);
+
+    /**
+     * Calculates bounding box of current font setting
+     *
+     * @return array
+     */
+    abstract public function getBoxSize();
 
     /**
      * Create a new instance of Font
@@ -96,6 +103,8 @@ abstract class AbstractFont
     public function text($text)
     {
         $this->text = $text;
+
+        return $this;
     }
 
     /**
@@ -111,18 +120,20 @@ abstract class AbstractFont
     /**
      * Set font size in pixels
      *
-     * @param  integer $size
+     * @param  int $size
      * @return void
      */
     public function size($size)
     {
         $this->size = $size;
+
+        return $this;
     }
 
     /**
      * Get font size in pixels
      *
-     * @return integer
+     * @return int
      */
     public function getSize()
     {
@@ -138,6 +149,8 @@ abstract class AbstractFont
     public function color($color)
     {
         $this->color = $color;
+
+        return $this;
     }
 
     /**
@@ -153,18 +166,20 @@ abstract class AbstractFont
     /**
      * Set rotation angle of text
      *
-     * @param  integer $angle
+     * @param  int $angle
      * @return void
      */
     public function angle($angle)
     {
         $this->angle = $angle;
+
+        return $this;
     }
 
     /**
      * Get rotation angle of text
      *
-     * @return integer
+     * @return int
      */
     public function getAngle()
     {
@@ -180,6 +195,8 @@ abstract class AbstractFont
     public function align($align)
     {
         $this->align = $align;
+
+        return $this;
     }
 
     /**
@@ -201,6 +218,8 @@ abstract class AbstractFont
     public function valign($valign)
     {
         $this->valign = $valign;
+
+        return $this;
     }
 
     /**
@@ -222,6 +241,8 @@ abstract class AbstractFont
     public function file($file)
     {
         $this->file = $file;
+
+        return $this;
     }
 
     /**
@@ -279,7 +300,7 @@ abstract class AbstractFont
     /**
      * Counts lines of text to be written
      *
-     * @return integer
+     * @return int
      */
     public function countLines()
     {

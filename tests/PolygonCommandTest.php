@@ -1,24 +1,25 @@
 <?php
 
 use Intervention\Image\Commands\PolygonCommand;
+use PHPUnit\Framework\TestCase;
 
-class PolygonCommandTest extends PHPUnit_Framework_TestCase
+class PolygonCommandTest extends TestCase
 {
     public function tearDown()
     {
         Mockery::close();
     }
-    
+
     public function testGd()
     {
-        $points = array(1, 2, 3, 4, 5, 6);
+        $points = [1, 2, 3, 4, 5, 6];
         $resource = imagecreatefromjpeg(__DIR__.'/images/test.jpg');
         $driver = Mockery::mock('\Intervention\Image\Gd\Driver');
         $driver->shouldReceive('getDriverName')->once()->andReturn('Gd');
         $image = Mockery::mock('\Intervention\Image\Image');
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($resource);
-        $command = new PolygonCommand(array($points));
+        $command = new PolygonCommand([$points]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());
@@ -26,7 +27,7 @@ class PolygonCommandTest extends PHPUnit_Framework_TestCase
 
     public function testImagick()
     {
-        $points = array(1, 2, 3, 4, 5, 6);
+        $points = [1, 2, 3, 4, 5, 6];
         $imagick = Mockery::mock('\Imagick');
         $imagick->shouldReceive('drawimage');
         $driver = Mockery::mock('\Intervention\Image\Imagick\Driver');
@@ -35,7 +36,7 @@ class PolygonCommandTest extends PHPUnit_Framework_TestCase
         $image->shouldReceive('getDriver')->once()->andReturn($driver);
         $image->shouldReceive('getCore')->once()->andReturn($imagick);
 
-        $command = new PolygonCommand(array($points));
+        $command = new PolygonCommand([$points]);
         $result = $command->execute($image);
         $this->assertTrue($result);
         $this->assertFalse($command->hasOutput());

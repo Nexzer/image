@@ -1,7 +1,8 @@
 <?php
 use Intervention\Image\Commands\StreamCommand;
+use PHPUnit\Framework\TestCase;
 
-class StreamCommandTest extends PHPUnit_Framework_TestCase
+class StreamCommandTest extends TestCase
 {
     public function tearDown()
     {
@@ -22,7 +23,7 @@ class StreamCommandTest extends PHPUnit_Framework_TestCase
             ->once()
             ->andReturn($encodedContent);
 
-        $command = new StreamCommand(array('jpg', 87));
+        $command = new StreamCommand(['jpg', 87]);
         $result = $command->execute($image);
 
         $this->assertTrue($result);
